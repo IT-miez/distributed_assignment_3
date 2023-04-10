@@ -35,14 +35,31 @@ def handleClient(client):
         try:
           message = client.recv(1024).decode()
           message, givenChannel = message.split("|")
+          messageActual = message.split(" ")[1]
+          print(message)
+          print(messageActual)
 
-          if message.startswith("/pm "):
+          if(message.endswith("quit")):
+              print("ENDING CLIENT CONNECTION")
+              client.close()
+              print("Closed a client connection.")
+              break
+
+          if messageActual.startswith("/pm"):
+              print("Sending PM")
               recipient, privateMessage = message.split(" ", 2)[1:]
+              recipient = message.split()[2]
+              print("recipient is:")
+              print(recipient)
+              print("message is: ")
+              print(privateMessage)
               recipientIndex = nicknames.index(recipient)
               recipientClient = clients[recipientIndex]
               recipientClient.send(f"PM from {privateMessage}".encode("utf-8"))
 
-          if(givenChannel == "1"):
+          
+
+          elif(givenChannel == "1"):
                channel1(message)
                print("Sent a message to channel 1")
           elif(givenChannel == "2"):
@@ -58,9 +75,9 @@ def handleClient(client):
           index = clients.index
           clients.remove(client)
           client.close()
-          nickname = nicknames[index]
-          channel1(f'{nickname} has disconnected.'.encode('utf-8'))
-          nicknames.remove(nickname)
+          #nickname = nicknames[index]
+          #channel1(f'User has disconnected.'.encode('utf-8'))
+          #nicknames.remove(nickname)
           break
 
 
@@ -73,7 +90,7 @@ def connectToClients():
           print(f'connection is established with {str(address)}')
 
           client.send('alias?'.encode('utf-8'))
-          nickname = client.recv(1024)
+          nickname = client.recv(1024).decode("utf-8")
 
           client.send('channel?'.encode('utf-8'))
           givenChannel = client.recv(1024)

@@ -14,19 +14,25 @@ def receiveFunction():
             message = client.recv(1024).decode("utf-8")
             if message == "alias?":
                 client.send(nickname.encode("utf-8"))
-            if message == "channel?":
+            elif message == "channel?":
                 client.send(channelOfClient.encode("utf-8"))
             else:
                 print(message)
         except:
-            print("Error")
+            print("Ending client through server")
             client.close()
             break
-
+        
 def clientSendMessage():
     while True:
         message = f'{nickname}: {input("")}|{channelOfClient}'
-        client.send(message.encode("utf-8"))
+        if message == f'{nickname}: quit|{channelOfClient}':
+            print("Closing client")
+            client.send(message.encode("utf-8"))
+            client.close()
+            break
+        else:
+            client.send(message.encode("utf-8"))
 
 receiveThread = threading.Thread(target=receiveFunction)
 receiveThread.start()
